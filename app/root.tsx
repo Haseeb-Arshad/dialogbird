@@ -4,10 +4,19 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import "./tailwind.css";
+
+// Register GSAP plugins
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -18,11 +27,24 @@ export const links: LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://api.fontshare.com/v2/css?f[]=general-sans@500,600,400,700&display=swap",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,301,701,300,501,401,901,400&display=swap",
   },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+
+  useEffect(() => {
+    return () => {
+      // Clear ScrollTrigger on unmount
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, [location]);
+
   return (
     <html lang="en">
       <head>
@@ -31,7 +53,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="font-body bg-white text-gray-900">
         {children}
         <ScrollRestoration />
         <Scripts />
